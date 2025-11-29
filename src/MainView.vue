@@ -20,7 +20,7 @@ const api = 'https://hot.api.yik.at';
 
 const appList = [
   {
-    name: '百度',
+    name: '哔哩哔哩',
     icon: bilibili,
     api: '/bilibili',
   },
@@ -28,6 +28,9 @@ const appList = [
 </script>
 <style scoped>
 main {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 响应式列布局 */
+  gap: 20px; /* 卡片之间的间距 */
   max-width: 1200px;
   width: 100%;
   padding: 20px;

@@ -56,4 +56,5 @@ a:focus {
 }
 a {
   cursor: pointer !important;
+  text-decoration: none !important;
 }

@@ -4,22 +4,24 @@
       <img :src="appIcon" alt="App Icon" class="app-icon" />
       <h2 class="app-name">{{ appName }}</h2>
     </div>
-    <div v-if="loading" class="loading-indicator">加载中...</div>
-    <div v-if="error" class="error-message">错误: {{ error.message }}</div>
-    <ul v-if="hotSearchData.length" class="hot-search-list">
-      <li v-for="(item, index) in hotSearchData" :key="item.id" class="hot-search-item">
-        <span class="rank">{{ index + 1 }}</span>
-        <div class="item-content">
-          <a :href="item.url" target="_blank" class="item-title">{{ item.title }}</a>
-          <div class="item-meta">
-            <span v-if="item.author" class="item-author">作者: {{ item.author }}</span>
-            <span class="item-hot">热度: {{ item.hot }}</span>
+    <div class="app-content-wrapper">
+      <div v-if="loading" class="loading-indicator">加载中...</div>
+      <div v-if="error" class="error-message">错误: {{ error.message }}</div>
+      <ul v-if="hotSearchData.length" class="hot-search-list">
+        <li v-for="(item, index) in hotSearchData" :key="item.id" class="hot-search-item">
+          <span class="rank">{{ index + 1 }}</span>
+          <div class="item-content">
+            <a :href="item.url" target="_blank" class="item-title">{{ item.title }}</a>
+            <div class="item-meta">
+              <span v-if="item.author" class="item-author">{{ item.author }}</span>
+              <span class="item-hot">{{ formatHot(item.hot) }}</span>
+            </div>
           </div>
-        </div>
-        <img v-if="item.cover" :src="item.cover" alt="Cover" class="item-cover" />
-      </li>
-    </ul>
-    <div v-else-if="!loading && !error" class="no-data">暂无数据</div>
+          <img v-if="item.cover" :src="item.cover" alt="Cover" class="item-cover" />
+        </li>
+      </ul>
+      <div v-else-if="!loading && !error" class="no-data">暂无数据</div>
+    </div>
   </div>
 </template>
 
@@ -71,7 +73,8 @@ const fetchHotSearchData = async () => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: ApiResponse = await response.json();
-    hotSearchData.value = data.data;
+    // 根据热度进行排序
+    hotSearchData.value = data.data.sort((a, b) => b.hot - a.hot);
   } catch (e) {
     if (e instanceof Error) {
       error.value = e;
@@ -86,36 +89,62 @@ const fetchHotSearchData = async () => {
 onMounted(() => {
   fetchHotSearchData();
 });
+
+// 格式化热度显示
+const formatHot = (hot: number): string => {
+  if (hot >= 10000) {
+    return (hot / 10000).toFixed(2) + 'w';
+  } else if (hot >= 7000) {
+    // 超过7千但不足一万，显示为0.XXW
+    return (hot / 10000).toFixed(2) + 'w';
+  }
+  return hot.toString();
+};
 </script>
 
 <style scoped>
 .app-card {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: var(--title-bar-bg); /* 使用 CSS 变量 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 阴影保持不变 */
+  height: 500px; /* 统一卡片高度 */
+  display: flex; /* 使用 flex 布局确保内容从顶部开始 */
+  flex-direction: column; /* 垂直排列内容 */
 }
 
 .app-header {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  padding-bottom: 10px; /* 标题和内容之间的间距 */
+  border-bottom: 1px solid var(--border); /* 标题下方分隔线 */
+  /* 确保标题在滚动内容之上 */
+  z-index: 1;
+  position: sticky; /* 固定标题 */
+  top: 0;
+}
+
+.app-content-wrapper {
+  flex-grow: 1; /* 让内容区域占据剩余空间 */
+  overflow-y: auto; /* 仅内容区域滚动 */
+  padding-top: 10px; /* 调整内容顶部内边距，与标题分隔 */
 }
 
 .app-icon {
-  width: 48px;
-  height: 48px;
+  width: 22px;
+  height: 22px;
   border-radius: 8px;
-  margin-right: 15px;
+  margin-right: 10px;
+  margin-left: 6px;
   object-fit: cover;
 }
 
 .app-name {
-  font-size: 1.6em;
-  color: #333;
+  font-size: 16px;
+  color: var(--text-color);
   margin: 0;
+  margin-bottom: 2px;
 }
 
 .loading-indicator,
@@ -123,11 +152,11 @@ onMounted(() => {
 .no-data {
   text-align: center;
   padding: 20px 0;
-  color: #777;
+  color: var(--secondary-text-color); /* 使用 CSS 变量 */
 }
 
 .error-message {
-  color: #d9534f;
+  color: #d9534f; /* 错误颜色保持不变 */
 }
 
 .hot-search-list {
@@ -140,7 +169,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px dashed #eee;
+  border-bottom: 1px dashed var(--border); /* 使用 CSS 变量 */
 }
 
 .hot-search-item:last-child {
@@ -150,7 +179,7 @@ onMounted(() => {
 .rank {
   font-size: 1.2em;
   font-weight: bold;
-  color: #999;
+  color: var(--secondary-text-color); /* 使用 CSS 变量 */
   margin-right: 15px;
   width: 25px;
   text-align: center;
@@ -163,8 +192,8 @@ onMounted(() => {
 }
 
 .item-title {
-  font-size: 1.1em;
-  color: #337ab7;
+  font-size: 15px;
+  color: var(--text-color); /* 使用 CSS 变量 */
   text-decoration: none;
   transition: color 0.2s;
   display: block; /* Ensures title takes full width */
@@ -172,13 +201,13 @@ onMounted(() => {
 }
 
 .item-title:hover {
-  color: #23527c;
+  color: var(--secondary-text-color); /* 使用 CSS 变量 */
   text-decoration: underline;
 }
 
 .item-meta {
-  font-size: 0.9em;
-  color: #888;
+  font-size: 13px;
+  color: var(--secondary-text-color); /* 使用 CSS 变量 */
 }
 
 .item-author {
@@ -186,7 +215,7 @@ onMounted(() => {
 }
 
 .item-hot {
-  color: #f0ad4e;
+  color: #f0ad4e; /* 热度颜色保持不变 */
 }
 
 .item-cover {
