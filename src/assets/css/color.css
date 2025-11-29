@@ -9,6 +9,7 @@
   --item-bg: #f8f8f8; /* 列表项背景 */
   --item-bg: #f8f8f8; /* 列表项背景 */
   --title-bar-height: 60px; /* 标题栏初始高度 */
+  --border: #efeff5;
 }
 
 [data-theme='dark'] {
