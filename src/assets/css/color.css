@@ -1,0 +1,7 @@
+:root {
+  --bg: #fafafc;
+}
+
+[data-theme='dark'] :root {
+  --bg: #101014;
+}

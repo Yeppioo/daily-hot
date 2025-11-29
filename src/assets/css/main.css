@@ -1,0 +1,57 @@
+@import url(./color.css);
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+body {
+  font-family: 'a', sans-serif;
+  background-size: cover;
+  background-color: var(--bg);
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden; /* Prevent scrollbar during animation */
+  overflow-x: hidden;
+  width: 100vw;
+  overflow-y: scroll;
+  overflow-y: scroll;
+}
+/* 全局滚动条美化 */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff6ea3;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(252, 158, 192);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+#app {
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+a:hover,
+a:link,
+a:visited,
+a:active,
+a:focus {
+  text-decoration: none;
+  outline: none;
+  border: none;
+  color: inherit;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+a {
+  cursor: pointer !important;
+}
