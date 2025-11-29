@@ -1,9 +1,30 @@
 <template>
   <TitleBar></TitleBar>
-  <main class="container"></main>
+  <main class="container">
+    <AppCard
+      v-for="app in appList"
+      :app-name="app.name"
+      :app-icon="app.icon"
+      :api-url="api + app.api"
+      :key="app.name"
+      :app="app"></AppCard>
+  </main>
 </template>
 <script setup lang="ts">
 import TitleBar from './components/TitleBar.vue';
+import AppCard from './components/AppCard.vue';
+
+import bilibili from './assets/app/bilibili.png';
+
+const api = 'https://hot.api.yik.at';
+
+const appList = [
+  {
+    name: '百度',
+    icon: bilibili,
+    api: '/bilibili',
+  },
+];
 </script>
 <style scoped>
 main {
