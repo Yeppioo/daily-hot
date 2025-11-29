@@ -15,37 +15,19 @@ main {
   max-width: 1200px;
   width: 100%;
   padding: 20px;
+  padding-top: 100px; /* 为吸顶的标题栏留出空间 */
   margin: 0 auto; /* 居中显示 */
   min-height: 150vh; /* 确保有足够的滚动内容 */
 }
 
 .placeholder-item {
   height: 50px;
-  background-color: var(--item-bg, #f0f0f0);
+  background-color: var(--item-bg);
   margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 5px;
-  color: var(--text-color, #333);
-}
-
-/* 添加一些主题变量，确保在 dark 模式下颜色也合适 */
-:root {
-  --item-bg: #f0f0f0;
-  --text-color: #333;
-  --secondary-text-color: #888;
-  --button-bg: #f0f0f0;
-  --button-color: #333;
-  --button-hover-bg: #e0e0e0;
-}
-
-[data-theme='dark'] {
-  --item-bg: #222;
-  --text-color: #e0e0e0;
-  --secondary-text-color: #aaa;
-  --button-bg: #333;
-  --button-color: #e0e0e0;
-  --button-hover-bg: #444;
+  color: var(--text-color);
 }
 </style>
