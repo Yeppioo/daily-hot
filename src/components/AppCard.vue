@@ -1,7 +1,7 @@
 <template>
   <div class="app-card">
     <div class="app-header">
-      <img :src="appIcon" alt="App Icon" class="app-icon" />
+      <img :src="`app-icon${apiUrl}.png`" alt="App Icon" class="app-icon" />
       <h2 class="app-name">{{ appName }}</h2>
     </div>
     <div class="app-content-wrapper">
@@ -56,25 +56,26 @@ interface ApiResponse {
 
 const props = defineProps<{
   appName: string;
-  appIcon: string;
   apiUrl: string;
 }>();
 
 const hotSearchData = ref<HotSearchItem[]>([]);
 const loading = ref(true);
 const error = ref<Error | null>(null);
+const api = 'https://hot.api.yik.at';
 
 const fetchHotSearchData = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await fetch(props.apiUrl);
+    const response = await fetch(api + props.apiUrl);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: ApiResponse = await response.json();
     // 根据热度进行排序
-    hotSearchData.value = data.data.sort((a, b) => b.hot - a.hot);
+    hotSearchData.value = data.data;
+    // hotSearchData.value = data.data.sort((a, b) => b.hot - a.hot);
   } catch (e) {
     if (e instanceof Error) {
       error.value = e;
@@ -92,13 +93,17 @@ onMounted(() => {
 
 // 格式化热度显示
 const formatHot = (hot: number): string => {
-  if (hot >= 10000) {
-    return (hot / 10000).toFixed(2) + 'w';
-  } else if (hot >= 7000) {
-    // 超过7千但不足一万，显示为0.XXW
-    return (hot / 10000).toFixed(2) + 'w';
+  try {
+    if (hot >= 10000) {
+      return (hot / 10000).toFixed(2) + 'w';
+    } else if (hot >= 7000) {
+      // 超过7千但不足一万，显示为0.XXW
+      return (hot / 10000).toFixed(2) + 'w';
+    }
+    return hot.toString();
+  } catch {
+    return 'N/A';
   }
-  return hot.toString();
 };
 </script>
 
@@ -106,7 +111,6 @@ const formatHot = (hot: number): string => {
 .app-card {
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px;
   background-color: var(--title-bar-bg); /* 使用 CSS 变量 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 阴影保持不变 */
   height: 500px; /* 统一卡片高度 */
@@ -115,6 +119,9 @@ const formatHot = (hot: number): string => {
 }
 
 .app-header {
+  margin-top: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
   display: flex;
   align-items: center;
   padding-bottom: 10px; /* 标题和内容之间的间距 */
@@ -126,6 +133,7 @@ const formatHot = (hot: number): string => {
 }
 
 .app-content-wrapper {
+  padding: 0 16px;
   flex-grow: 1; /* 让内容区域占据剩余空间 */
   overflow-y: auto; /* 仅内容区域滚动 */
   padding-top: 10px; /* 调整内容顶部内边距，与标题分隔 */
@@ -161,6 +169,8 @@ const formatHot = (hot: number): string => {
 
 .hot-search-list {
   list-style: none;
+  margin: 0 16px;
+
   padding: 0;
   margin: 0;
 }
