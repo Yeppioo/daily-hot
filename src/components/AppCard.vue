@@ -3,11 +3,27 @@
     <div class="app-header">
       <img :src="`app-icon${apiUrl}.png`" alt="App Icon" class="app-icon" />
       <h2 class="app-name">{{ appName }}</h2>
-      <div v-if="formattedUpdateTime" class="update-time">{{ formattedUpdateTime }}</div>
+      <div v-if="formattedUpdateTime && !loading && !error" class="update-time">
+        {{ formattedUpdateTime }}
+        <button class="icon-button refresh-button small" @click="fetchHotSearchData">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 512 512">
+            <path
+              d="M436.7 74.7L448 85.4 448 32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l47.9 0-7.6-7.2c-.2-.2-.4-.4-.6-.6-75-75-196.5-75-271.5 0s-75 196.5 0 271.5 196.5 75 271.5 0c8.2-8.2 15.5-16.9 21.9-26.1 10.1-14.5 30.1-18 44.6-7.9s18 30.1 7.9 44.6c-8.5 12.2-18.2 23.8-29.1 34.7-100 100-262.1 100-362 0S-25 175 75 75c99.9-99.9 261.7-100 361.7-.3z" />
+          </svg>
+        </button>
+      </div>
     </div>
     <div class="app-content-wrapper">
       <div v-if="loading" class="loading-indicator">加载中...</div>
-      <div v-if="error" class="error-message">错误: {{ error.message }}</div>
+      <div v-if="error" class="error-message">
+        错误: {{ error.message }}
+        <button class="icon-button big" @click="fetchHotSearchData">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 512 512">
+            <path
+              d="M436.7 74.7L448 85.4 448 32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l47.9 0-7.6-7.2c-.2-.2-.4-.4-.6-.6-75-75-196.5-75-271.5 0s-75 196.5 0 271.5 196.5 75 271.5 0c8.2-8.2 15.5-16.9 21.9-26.1 10.1-14.5 30.1-18 44.6-7.9s18 30.1 7.9 44.6c-8.5 12.2-18.2 23.8-29.1 34.7-100 100-262.1 100-362 0S-25 175 75 75c99.9-99.9 261.7-100 361.7-.3z" />
+          </svg>
+        </button>
+      </div>
       <ul v-if="hotSearchData.length" class="hot-search-list">
         <li v-for="(item, index) in hotSearchData" :key="item.id" class="hot-search-item">
           <span class="rank">{{ index + 1 }}</span>
@@ -15,7 +31,7 @@
             <a :href="item.url" target="_blank" class="item-title">{{ item.title }}</a>
             <div class="item-meta">
               <span v-if="item.author" class="item-author">{{ item.author }}</span>
-              <span class="item-hot">{{ formatHot(item.hot) }}</span>
+              <span v-if="formatHot(item.hot)" class="item-hot">{{ formatHot(item.hot) }}</span>
             </div>
           </div>
           <img v-if="item.cover" :src="item.cover" alt="Cover" class="item-cover" />
@@ -107,7 +123,7 @@ onMounted(() => {
 });
 
 // 格式化热度显示
-const formatHot = (hot: number): string => {
+const formatHot = (hot: number): string | undefined => {
   try {
     if (hot >= 10000) {
       return (hot / 10000).toFixed(2) + 'w';
@@ -117,12 +133,45 @@ const formatHot = (hot: number): string => {
     }
     return hot.toString();
   } catch {
-    return 'N/A';
+    return undefined;
   }
 };
 </script>
 
 <style scoped>
+.icon-button path {
+  fill: var(--secondary-text-color);
+}
+.big {
+  margin-top: 30px;
+  padding: 10px 50px !important;
+  width: unset !important;
+  border-radius: 999px !important;
+}
+.big svg {
+  width: 16px;
+}
+.icon-button {
+  background-color: var(--button-bg);
+  border: none;
+  border-radius: 16px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 65px;
+}
+.buttons .icon-button {
+  padding: 6px;
+  margin-left: 15px;
+}
+
+.icon-button:hover {
+  background-color: var(--button-hover-bg);
+}
 .app-card {
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -155,8 +204,10 @@ const formatHot = (hot: number): string => {
   font-size: 12px;
   color: var(--secondary-text-color);
   background-color: var(--title-bar-bg); /* 背景颜色与卡片头部一致 */
-  padding: 2px 8px;
   border-radius: 0 8px 0 8px; /* 圆角与卡片顶部圆角匹配 */
+  display: flex; /* 使用 flex 布局 */
+  align-items: center; /* 垂直居中 */
+  margin-top: -2px;
 }
 
 .app-content-wrapper {
@@ -192,6 +243,9 @@ const formatHot = (hot: number): string => {
 
 .error-message {
   color: #d9534f; /* 错误颜色保持不变 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hot-search-list {
